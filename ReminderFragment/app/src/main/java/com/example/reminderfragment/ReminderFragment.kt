@@ -1,11 +1,13 @@
 package com.example.reminderfragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +32,7 @@ class ReminderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initViews()
+        observeAddReminderResult()
     }
 
     private fun initViews() {
@@ -38,6 +41,18 @@ class ReminderFragment : Fragment() {
             LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         rvReminders.adapter = reminderAdapter
         rvReminders.addItemDecoration(DividerItemDecoration(context,DividerItemDecoration.VERTICAL))
+    }
+
+    private fun observeAddReminderResult() {
+        setFragmentResultListener(REQ_REMINDER_KEY) { key, bundle ->
+            bundle.getString(BUNDLE_REMINDER_KEY)?.let {
+                val reminder = Reminder(it)
+
+                reminders.add(reminder)
+                reminderAdapter.notifyDataSetChanged()
+            } ?: Log.e("ReminderFragment", "Request triggered, but empty reminder text!")
+
+        }
     }
 
 
